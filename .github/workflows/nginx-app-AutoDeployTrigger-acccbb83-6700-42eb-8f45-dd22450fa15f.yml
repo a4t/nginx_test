@@ -1,0 +1,42 @@
+name: Trigger auto deployment for nginx-app
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ master ]
+    paths:
+    - '**'
+    - '.github/workflows/nginx-app-AutoDeployTrigger-acccbb83-6700-42eb-8f45-dd22450fa15f.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.NGINXAPP_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: azuresandbox.azurecr.io
+          registryUsername: ${{ secrets.NGINXAPP_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.NGINXAPP_REGISTRY_PASSWORD }}
+          containerAppName: nginx-app
+          resourceGroup: patnior-dev1
+          imageToBuild: azuresandbox.azurecr.io/nginx:${{ github.sha }}
+          dockerfilePath: Dockerfile
+
+     
+
