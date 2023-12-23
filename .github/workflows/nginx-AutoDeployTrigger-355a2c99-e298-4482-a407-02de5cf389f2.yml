@@ -37,6 +37,5 @@ jobs:
           resourceGroup: patnior-dev1
           imageToBuild: azuresandbox.azurecr.io/nginx:${{ github.sha }}
           dockerfilePath: Dockerfile
-
-     
-
+          environmentVariables:
+            - aaaa: bbbbbb
